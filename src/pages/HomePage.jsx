@@ -1,7 +1,15 @@
 import { useState, useEffect, useRef } from "react";
-import { Flame, TrendingUp, Star, ArrowRight } from "lucide-react";
+import {
+  Flame,
+  TrendingUp,
+  Star,
+  ArrowRight,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
 import RecipeCard from "../components/RecipeCard";
 import { useNavigate } from "react-router-dom";
+import AutoScrollRecipeSection from "../components/AutoScrollRecipeSection";
 
 // Animated Counter Component
 const AnimatedCounter = ({ end, suffix = "", duration = 2000 }) => {
@@ -13,7 +21,6 @@ const AnimatedCounter = ({ end, suffix = "", duration = 2000 }) => {
     const element = countRef.current;
     if (!element) return;
 
-    // Intersection Observer to trigger animation when element comes into view
     observerRef.current = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
@@ -21,7 +28,7 @@ const AnimatedCounter = ({ end, suffix = "", duration = 2000 }) => {
           observerRef.current?.unobserve(element);
         }
       },
-      { threshold: 0.3 } // Lower threshold for earlier trigger
+      { threshold: 0.3 }
     );
 
     observerRef.current.observe(element);
@@ -33,7 +40,7 @@ const AnimatedCounter = ({ end, suffix = "", duration = 2000 }) => {
 
   const startCounting = () => {
     let start = 0;
-    const increment = end / (duration / 16); // 60fps
+    const increment = end / (duration / 16);
     const timer = setInterval(() => {
       start += increment;
       if (start >= end) {
@@ -125,22 +132,7 @@ const HomePage = () => {
     fetchRecipes();
   }, []);
 
-  // Format recipe data for RecipeCard component
-  const formatRecipeForCard = (apiRecipe) => {
-    return {
-      id: apiRecipe.idMeal,
-      title: apiRecipe.strMeal,
-      category: apiRecipe.strCategory,
-      cuisine: apiRecipe.strArea,
-      image: apiRecipe.strMealThumb,
-      rating: (Math.random() * 2 + 3).toFixed(1),
-      cookTime: `${Math.floor(Math.random() * 30) + 15} mins`,
-      difficulty: ["Easy", "Medium", "Hard"][Math.floor(Math.random() * 3)],
-      tags: apiRecipe.strTags ? apiRecipe.strTags.split(",") : [],
-    };
-  };
-
-  // Hero background image (you can replace with your own high-quality image)
+  // Hero background image
   const heroBackground = "/Images/home-hero.jpeg";
 
   return (
@@ -175,7 +167,7 @@ const HomePage = () => {
       </section>
 
       {/* Enhanced Stats Section with Counting Animation */}
-      <section className="bg-white py-12 sm:py-16 lg:py-20 ">
+      <section className="bg-white py-12 sm:py-16 lg:py-20">
         <div className="container mx-auto px-4 sm:px-6">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8 text-center">
             <div className="space-y-2 sm:space-y-3 transform hover:scale-105 transition-transform duration-300 p-2 sm:p-0">
@@ -202,8 +194,6 @@ const HomePage = () => {
                 <Star
                   className="fill-green-500 text-green-500 flex-shrink-0"
                   size={16}
-                  sm:size={18}
-                  lg:size={20}
                 />
               </div>
               <div className="text-sm sm:text-base lg:text-lg text-gray-600 font-medium">
@@ -229,93 +219,23 @@ const HomePage = () => {
           </div>
         ) : (
           <>
-            {/* Most Popular Recipes */}
-            <section className="mb-16 sm:mb-20 lg:mb-24">
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8 sm:mb-10 gap-4 sm:gap-0">
-                <div className="flex items-center space-x-3 sm:space-x-4">
-                  <div className="p-2 sm:p-3 bg-green-100 rounded-xl sm:rounded-2xl">
-                    <Flame className="text-green-600" size={24} sm:size={28} />
-                  </div>
-                  <div>
-                    <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">
-                      Most Popular Recipes
-                    </h2>
-                    <p className="text-sm sm:text-base text-gray-600 mt-1">
-                      Tried and loved by our community
-                    </p>
-                  </div>
-                </div>
+            {/* Most Popular Recipes with Auto-scroll */}
+            <AutoScrollRecipeSection
+              recipes={recipes.popular}
+              title="Most Popular Recipes"
+              description="Tried and loved by our community"
+              icon={Flame}
+              onViewAll={() => navigate("/all-recipes")}
+            />
 
-                <button
-                  onClick={() => navigate("/all-recipes")}
-                  className="hidden sm:flex items-center space-x-2 text-green-600 hover:text-green-700 font-semibold transition-colors"
-                >
-                  <span>View All</span>
-                  <ArrowRight size={16} />
-                </button>
-              </div>
-              <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
-                {recipes.popular.map((recipe) => (
-                  <RecipeCard
-                    key={recipe.idMeal}
-                    recipe={formatRecipeForCard(recipe)}
-                  />
-                ))}
-                <button
-                  onClick={() => navigate("/all-recipes")}
-                  className="flex sm:hidden items-center space-x-2 text-green-600 hover:text-green-700 font-semibold transition-colors justify-center border border-green-200 rounded-lg py-2 px-4 bg-green-50"
-                >
-                  <span>View All</span>
-                  <ArrowRight size={16} />
-                </button>
-              </div>
-            </section>
-
-            {/* Trending Recipes */}
-            <section className="mb-16 sm:mb-20 lg:mb-24">
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8 sm:mb-10 gap-4 sm:gap-0">
-                <div className="flex items-center space-x-3 sm:space-x-4">
-                  <div className="p-2 sm:p-3 bg-green-50 rounded-xl sm:rounded-2xl border border-green-200">
-                    <TrendingUp
-                      className="text-green-600"
-                      size={24}
-                      sm:size={28}
-                    />
-                  </div>
-                  <div>
-                    <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">
-                      Trending Now
-                    </h2>
-                    <p className="text-sm sm:text-base text-gray-600 mt-1">
-                      What's hot in the culinary world
-                    </p>
-                  </div>
-                </div>
-
-                <button
-                  onClick={() => navigate("/all-recipes")}
-                  className="hidden sm:flex items-center space-x-2 text-green-600 hover:text-green-700 font-semibold transition-colors"
-                >
-                  <span>View All</span>
-                  <ArrowRight size={16} />
-                </button>
-              </div>
-              <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
-                {recipes.trending.map((recipe) => (
-                  <RecipeCard
-                    key={recipe.idMeal}
-                    recipe={formatRecipeForCard(recipe)}
-                  />
-                ))}
-                <button
-                  onClick={() => navigate("/all-recipes")}
-                  className="flex sm:hidden items-center space-x-2 text-green-600 hover:text-green-700 font-semibold transition-colors justify-center border border-green-200 rounded-lg py-2 px-4 bg-green-50"
-                >
-                  <span>View All</span>
-                  <ArrowRight size={16} />
-                </button>
-              </div>
-            </section>
+            {/* Trending Recipes with Auto-scroll */}
+            <AutoScrollRecipeSection
+              recipes={recipes.trending}
+              title="Trending Now"
+              description="What's hot in the culinary world"
+              icon={TrendingUp}
+              onViewAll={() => navigate("/all-recipes")}
+            />
           </>
         )}
 
