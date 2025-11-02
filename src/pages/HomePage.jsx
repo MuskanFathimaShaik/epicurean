@@ -106,15 +106,15 @@ const HomePage = () => {
       const allFetchedRecipes = new Set();
 
       // Fetch 8 unique recipes total (4 for popular, 4 for trending)
-      while (popularRecipes.length < 4 || trendingRecipes.length < 4) {
+      while (popularRecipes.length < 8 || trendingRecipes.length < 8) {
         const recipe = await fetchSingleRecipe();
 
         if (recipe && !allFetchedRecipes.has(recipe.idMeal)) {
           allFetchedRecipes.add(recipe.idMeal);
 
-          if (popularRecipes.length < 4) {
+          if (popularRecipes.length < 8) {
             popularRecipes.push(recipe);
-          } else if (trendingRecipes.length < 4) {
+          } else if (trendingRecipes.length < 8) {
             trendingRecipes.push(recipe);
           }
         }
