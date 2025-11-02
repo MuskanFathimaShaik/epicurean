@@ -356,7 +356,7 @@ const RecipesListPage = () => {
                     className={`relative overflow-hidden bg-gray-200 ${
                       viewMode === "grid"
                         ? "h-40 sm:h-48 flex-shrink-0"
-                        : "lg:w-64 xl:w-80 lg:h-56 xl:h-64 flex-shrink-0"
+                        : "lg:w-64 xl:w-80 h-full flex-shrink-0"
                     }`}
                   >
                     <img
